@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-pedidos
+  labels:
+    app: app-pedidos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-pedidos
+  template:
+    metadata:
+      labels:
+        app: app-pedidos
+    spec:
+      containers:
+      - name: app-pedidos
+        image: doubleduardo/app-pedidos
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DATABASE_URL_ARG
+          valueFrom: 
+            configMapKeyRef:
+              name: app-pedidos-configmap
+              key: database_url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-pedidos-service
+spec:
+  selector:
+    app: app-pedidos
+  type: LoadBalancer  
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+      nodePort: 30000
